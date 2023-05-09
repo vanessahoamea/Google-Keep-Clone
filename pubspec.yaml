@@ -42,6 +42,9 @@ dependencies:
   # HTTP module for API requests
   http: ^0.13.6
 
+  # REST API framework
+  shelf_router: ^1.1.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

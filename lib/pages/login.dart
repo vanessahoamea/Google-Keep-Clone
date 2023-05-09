@@ -24,11 +24,16 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void redirect(BuildContext context) {
+  void redirect(BuildContext context, int userId) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const HomePage(title: "Google Keep Clone")));
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          title: "Google Keep Clone",
+          userId: userId,
+        ),
+      ),
+    );
   }
 
   @override
@@ -61,8 +66,9 @@ class _LoginPageState extends State<LoginPage> {
 
           // sign in button
           MainButton(
-            email: emailController.text,
-            password: passwordController.text,
+            emailController: emailController,
+            passwordController: passwordController,
+            redirect: redirect,
           ),
         ],
       ),

@@ -3,17 +3,16 @@ import "login.dart";
 import "../main.dart";
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, required this.title, required this.userId});
 
   final String title;
+  final int userId;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final int? userId = null;
-
   var themeIcon = MyApp.themeNotifier.value == ThemeMode.dark
       ? Icons.light_mode
       : Icons.dark_mode;
@@ -40,9 +39,9 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
+          children: <Widget>[
             Text(
-              "Testing dark & light mode switch...",
+              "Logged in as user ${widget.userId}.",
             ),
           ],
         ),
