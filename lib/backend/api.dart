@@ -1,8 +1,8 @@
 import "dart:convert";
-import "package:project/backend/database.dart";
 import "package:shelf_router/shelf_router.dart";
 import "package:shelf/shelf.dart";
 import "package:shelf/shelf_io.dart" as io;
+import "package:project/backend/database.dart";
 
 void main() async {
   var app = Router();
@@ -27,7 +27,11 @@ void main() async {
     var resp = await db.loginUser(data["email"], data["password"]);
     if (resp != null) {
       return Response.ok(
-          json.encode({"message": "Logged in successfully.", "id": resp}),
+          json.encode({
+            "message": "Logged in successfully.",
+            "id": resp,
+            "email": data["email"],
+          }),
           headers: {"Access-Control-Allow-Origin": "*"});
     } else {
       return Response.notFound(json.encode({"message": "User not found."}),

@@ -1,18 +1,26 @@
 import "package:flutter/material.dart";
-import "login.dart";
-import "../main.dart";
+import "package:project/components/app_buttons.dart";
+import "package:project/components/main_button.dart";
+import "package:project/main.dart";
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title, required this.userId});
+  const HomePage({
+    super.key,
+    required this.title,
+    required this.userId,
+    required this.userEmail,
+  });
 
   final String title;
   final int userId;
+  final String userEmail;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  var notesView = Icons.view_list;
   var themeIcon = MyApp.themeNotifier.value == ThemeMode.dark
       ? Icons.light_mode
       : Icons.dark_mode;
@@ -20,6 +28,16 @@ class _HomePageState extends State<HomePage> {
   void toggleThemeIcon(IconData icon) {
     setState(() {
       themeIcon = icon;
+    });
+  }
+
+  void toggleNotesView() {
+    setState(() {
+      if (notesView == Icons.view_list) {
+        notesView = Icons.grid_view;
+      } else {
+        notesView = Icons.view_list;
+      }
     });
   }
 
@@ -38,11 +56,31 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text(
-              "Logged in as user ${widget.userId}.",
+            // user information and log out button
+            Padding(
+              padding: const EdgeInsets.only(top: 25, bottom: 5),
+              child: Text(
+                "Welcome back, ${widget.userEmail}!",
+                style: const TextStyle(fontSize: 18),
+              ),
             ),
+            MainButton(
+              buttonText: "Log out",
+              redirect: (context) => Navigator.pop(context),
+            ),
+
+            // create note and toggle view buttons
+            AppButtons(
+              notesView: notesView,
+              toggleNotesView: toggleNotesView,
+            ),
+
+            // view all notes
+            notesView == Icons.view_list
+                ? const Text("Displaying grid notes...")
+                : const Text("Displaying list notes..."),
           ],
         ),
       ),
