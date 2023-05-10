@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 
 class AppButtons extends StatelessWidget {
   final IconData notesView;
-  final void Function() toggleNotesView;
+  final void Function(IconData) toggleNotesView;
 
   const AppButtons({
     super.key,
@@ -13,7 +13,7 @@ class AppButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 50, bottom: 50),
+      padding: const EdgeInsets.only(top: 50, bottom: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -33,7 +33,11 @@ class AppButtons extends StatelessWidget {
             message: notesView == Icons.view_list ? "List view" : "Grid view",
             child: ElevatedButton(
               onPressed: () {
-                toggleNotesView();
+                if (notesView == Icons.view_list) {
+                  toggleNotesView(Icons.grid_view);
+                } else {
+                  toggleNotesView(Icons.view_list);
+                }
               },
               style: ElevatedButton.styleFrom(
                 shape: const CircleBorder(),

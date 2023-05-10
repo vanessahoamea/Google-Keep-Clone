@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:project/components/error_popup.dart";
 import "package:project/components/input_field.dart";
 import "package:project/components/main_button.dart";
 import "package:project/pages/home.dart";
@@ -37,8 +38,6 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       Map data = json.decode(response.body);
-      int userId = data["id"];
-      String userEmail = data["email"];
 
       // ignore: use_build_context_synchronously
       Navigator.push(
@@ -46,27 +45,17 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(
           builder: (context) => HomePage(
             title: "Google Keep Clone",
-            userId: userId,
-            userEmail: userEmail,
+            userId: data["id"],
+            userEmail: data["email"],
+            themeIcon: themeIcon,
+            toggleThemeIcon: toggleThemeIcon,
           ),
         ),
       );
     } else {
       // ignore: use_build_context_synchronously
-      showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("User not found"),
-          content: const Text("E-mail or password are incorrect."),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
-              onPressed: () => Navigator.pop(context, "Close"),
-              child: const Text("Close"),
-            ),
-          ],
-        ),
-      );
+      ErrorPopup(
+          context, "User not found", "E-mail or password are incorrect.");
     }
   }
 
@@ -79,30 +68,17 @@ class _LoginPageState extends State<LoginPage> {
           // upper text
           const Text(
             "Sign in to your account to continue",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+            style: TextStyle(fontSize: 30),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 30),
 
           // email and password fields
-          InputField(
-            controller: emailController,
-            hintText: "E-mail",
-            obscureText: false,
-          ),
-          InputField(
-            controller: passwordController,
-            hintText: "Password",
-            obscureText: true,
-          ),
+          InputField(controller: emailController, hintText: "E-mail"),
+          InputField(controller: passwordController, hintText: "Password"),
 
           // sign in button
-          MainButton(
-            buttonText: "Sign in",
-            redirect: handleLogin,
-          ),
+          MainButton(buttonText: "Sign in", redirect: handleLogin),
         ],
       ),
       floatingActionButton: FloatingActionButton(

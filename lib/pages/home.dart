@@ -1,5 +1,7 @@
 import "package:flutter/material.dart";
 import "package:project/components/app_buttons.dart";
+import "package:project/components/grid_notes.dart";
+import "package:project/components/list_notes.dart";
 import "package:project/components/main_button.dart";
 import "package:project/main.dart";
 
@@ -9,35 +11,28 @@ class HomePage extends StatefulWidget {
     required this.title,
     required this.userId,
     required this.userEmail,
+    required this.themeIcon,
+    required this.toggleThemeIcon,
   });
 
   final String title;
   final int userId;
   final String userEmail;
+  final IconData themeIcon;
+  final void Function(IconData) toggleThemeIcon;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  List notes = [];
   var notesView = Icons.view_list;
-  var themeIcon = MyApp.themeNotifier.value == ThemeMode.dark
-      ? Icons.light_mode
-      : Icons.dark_mode;
 
-  void toggleThemeIcon(IconData icon) {
+  void toggleNotesView(IconData view) {
     setState(() {
-      themeIcon = icon;
-    });
-  }
-
-  void toggleNotesView() {
-    setState(() {
-      if (notesView == Icons.view_list) {
-        notesView = Icons.grid_view;
-      } else {
-        notesView = Icons.view_list;
-      }
+      notesView = view;
+      notes = [1, 2, 3, 4, 5, 6, 7]; // for debugging
     });
   }
 
@@ -54,7 +49,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.amber,
         automaticallyImplyLeading: false,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
@@ -78,9 +73,12 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // view all notes
-            notesView == Icons.view_list
-                ? const Text("Displaying grid notes...")
-                : const Text("Displaying list notes..."),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: notesView == Icons.view_list
+                  ? GridNotes(notes: notes)
+                  : ListNotes(notes: notes),
+            ),
           ],
         ),
       ),
@@ -88,14 +86,14 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           if (MyApp.themeNotifier.value == ThemeMode.light) {
             MyApp.themeNotifier.value = ThemeMode.dark;
-            toggleThemeIcon(Icons.light_mode);
+            widget.toggleThemeIcon(Icons.light_mode);
           } else {
             MyApp.themeNotifier.value = ThemeMode.light;
-            toggleThemeIcon(Icons.dark_mode);
+            widget.toggleThemeIcon(Icons.dark_mode);
           }
         },
         backgroundColor: Colors.amber,
-        child: Icon(themeIcon),
+        child: Icon(widget.themeIcon),
       ),
     );
   }

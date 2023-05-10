@@ -3,13 +3,11 @@ import "package:flutter/material.dart";
 class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
-  final bool obscureText;
 
   const InputField({
     super.key,
     required this.controller,
     required this.hintText,
-    required this.obscureText,
   });
 
   @override
@@ -18,7 +16,7 @@ class InputField extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(50, 0, 50, 10),
       child: TextField(
         controller: controller,
-        obscureText: obscureText,
+        obscureText: hintText == "Password" ? true : false,
         decoration: InputDecoration(
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey),
