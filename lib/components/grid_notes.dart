@@ -19,14 +19,38 @@ class GridNotes extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           child: GestureDetector(
             onTap: () {
-              print("Pressed note ${notes[index]}");
+              print("Pressed note with the ID ${notes[index]['id']}");
             },
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text("Test ${notes[index]}"),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: notes[index]["title"] != "" &&
+                        notes[index]["title"] != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(notes[index]["title"],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              )),
+                          Text(
+                              notes[index]["content"].length > 200
+                                  ? "${notes[index]['content'].substring(0, 200)}..."
+                                  : notes[index]["content"],
+                              style: const TextStyle(fontSize: 18)),
+                        ],
+                      )
+                    : Text(
+                        notes[index]["content"].length > 200
+                            ? "${notes[index]['content'].substring(0, 200)}..."
+                            : notes[index]["content"],
+                        style: const TextStyle(fontSize: 18)),
+              ),
             ),
           ),
         );

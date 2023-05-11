@@ -4,6 +4,8 @@ import "package:project/components/grid_notes.dart";
 import "package:project/components/list_notes.dart";
 import "package:project/components/main_button.dart";
 import "package:project/main.dart";
+import "package:http/http.dart" as http;
+import "dart:convert";
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -32,8 +34,24 @@ class _HomePageState extends State<HomePage> {
   void toggleNotesView(IconData view) {
     setState(() {
       notesView = view;
-      notes = [1, 2, 3, 4, 5, 6, 7]; // for debugging
     });
+  }
+
+  void getNotes() async {
+    final response = await http
+        .get(Uri.parse("http://192.168.100.58:8080/notes/${widget.userId}"));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        notes = json.decode(response.body)["data"];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getNotes();
   }
 
   @override
@@ -70,15 +88,19 @@ class _HomePageState extends State<HomePage> {
             AppButtons(
               notesView: notesView,
               toggleNotesView: toggleNotesView,
+              getNotes: getNotes,
             ),
 
             // view all notes
             Padding(
               padding: const EdgeInsets.all(10),
-              child: notesView == Icons.view_list
-                  ? GridNotes(notes: notes)
-                  : ListNotes(notes: notes),
+              child: notes.isEmpty
+                  ? const Text("You don't have any notes yet.")
+                  : (notesView == Icons.view_list
+                      ? GridNotes(notes: notes)
+                      : ListNotes(notes: notes)),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
