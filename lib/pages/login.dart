@@ -17,14 +17,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  var themeIcon = MyApp.themeNotifier.value == ThemeMode.dark
-      ? Icons.light_mode
-      : Icons.dark_mode;
 
-  void toggleThemeIcon(IconData icon) {
-    setState(() {
-      themeIcon = icon;
-    });
+  void toggleThemeIcon() {
+    if (MyApp.themeNotifier.value == ThemeMode.light) {
+      MyApp.themeNotifier.value = ThemeMode.dark;
+    } else {
+      MyApp.themeNotifier.value = ThemeMode.light;
+    }
   }
 
   void handleLogin(BuildContext context) async {
@@ -47,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
             title: "Google Keep Clone",
             userId: data["id"],
             userEmail: data["email"],
-            themeIcon: themeIcon,
             toggleThemeIcon: toggleThemeIcon,
           ),
         ),
@@ -83,16 +81,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (MyApp.themeNotifier.value == ThemeMode.light) {
-            MyApp.themeNotifier.value = ThemeMode.dark;
-            toggleThemeIcon(Icons.light_mode);
-          } else {
-            MyApp.themeNotifier.value = ThemeMode.light;
-            toggleThemeIcon(Icons.dark_mode);
-          }
+          toggleThemeIcon();
         },
         backgroundColor: Colors.amber,
-        child: Icon(themeIcon),
+        child: const Icon(Icons.brightness_4),
       ),
     );
   }

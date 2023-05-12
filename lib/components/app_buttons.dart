@@ -1,17 +1,27 @@
 import "package:flutter/material.dart";
+import "package:project/pages/single_note.dart";
 
-class AppButtons extends StatelessWidget {
-  final IconData notesView;
-  final void Function(IconData) toggleNotesView;
-  final void Function() getNotes;
-
+class AppButtons extends StatefulWidget {
   const AppButtons({
     super.key,
     required this.notesView,
     required this.toggleNotesView,
     required this.getNotes,
+    required this.userId,
+    required this.toggleThemeIcon,
   });
 
+  final IconData notesView;
+  final void Function(IconData) toggleNotesView;
+  final void Function() getNotes;
+  final int? userId;
+  final void Function() toggleThemeIcon;
+
+  @override
+  State<AppButtons> createState() => _AppButtonsState();
+}
+
+class _AppButtonsState extends State<AppButtons> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -23,7 +33,20 @@ class AppButtons extends StatelessWidget {
           Tooltip(
             message: "Create note",
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                bool? reload = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SingleNote(
+                        userId: widget.userId,
+                        noteId: null,
+                        noteTitle: null,
+                        noteContent: null,
+                        toggleThemeIcon: widget.toggleThemeIcon,
+                      ),
+                    ));
+                if (reload != null && reload) widget.getNotes();
+              },
               style: ElevatedButton.styleFrom(
                 shape: const CircleBorder(),
                 padding: const EdgeInsets.all(15),
@@ -35,13 +58,14 @@ class AppButtons extends StatelessWidget {
 
           // toggle notes view button
           Tooltip(
-            message: notesView == Icons.view_list ? "List view" : "Grid view",
+            message:
+                widget.notesView == Icons.view_list ? "List view" : "Grid view",
             child: ElevatedButton(
               onPressed: () {
-                if (notesView == Icons.view_list) {
-                  toggleNotesView(Icons.grid_view);
+                if (widget.notesView == Icons.view_list) {
+                  widget.toggleNotesView(Icons.grid_view);
                 } else {
-                  toggleNotesView(Icons.view_list);
+                  widget.toggleNotesView(Icons.view_list);
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -49,7 +73,7 @@ class AppButtons extends StatelessWidget {
                 padding: const EdgeInsets.all(15),
                 backgroundColor: Colors.amber,
               ),
-              child: Icon(notesView, color: Colors.black),
+              child: Icon(widget.notesView, color: Colors.black),
             ),
           ),
 
@@ -58,7 +82,7 @@ class AppButtons extends StatelessWidget {
             message: "Refresh",
             child: ElevatedButton(
               onPressed: () {
-                getNotes();
+                widget.getNotes();
               },
               style: ElevatedButton.styleFrom(
                 shape: const CircleBorder(),

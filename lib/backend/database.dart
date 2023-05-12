@@ -75,4 +75,34 @@ class Database {
     await conn.close();
     return result;
   }
+
+  Future<bool> updateNote(
+      int noteId, String title, String content, String date) async {
+    PostgreSQLConnection conn = PostgreSQLConnection(
+      "localhost",
+      5432,
+      "google-keep",
+      username: "postgres",
+      password: "postgres",
+    );
+
+    await conn.open();
+
+    bool result = true;
+    try {
+      await conn.query(
+          "UPDATE notes SET title = @title, content = @content, date_modified = @date WHERE id = @id",
+          substitutionValues: {
+            "title": title,
+            "content": content,
+            "date": date,
+            "id": noteId
+          });
+    } catch (e) {
+      result = false;
+    }
+
+    await conn.close();
+    return result;
+  }
 }

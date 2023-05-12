@@ -3,7 +3,6 @@ import "package:project/components/app_buttons.dart";
 import "package:project/components/grid_notes.dart";
 import "package:project/components/list_notes.dart";
 import "package:project/components/main_button.dart";
-import "package:project/main.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
 
@@ -13,15 +12,13 @@ class HomePage extends StatefulWidget {
     required this.title,
     required this.userId,
     required this.userEmail,
-    required this.themeIcon,
     required this.toggleThemeIcon,
   });
 
   final String title;
   final int userId;
   final String userEmail;
-  final IconData themeIcon;
-  final void Function(IconData) toggleThemeIcon;
+  final void Function() toggleThemeIcon;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -89,33 +86,36 @@ class _HomePageState extends State<HomePage> {
               notesView: notesView,
               toggleNotesView: toggleNotesView,
               getNotes: getNotes,
+              userId: widget.userId,
+              toggleThemeIcon: widget.toggleThemeIcon,
             ),
 
             // view all notes
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
               child: notes.isEmpty
                   ? const Text("You don't have any notes yet.")
                   : (notesView == Icons.view_list
-                      ? GridNotes(notes: notes)
-                      : ListNotes(notes: notes)),
+                      ? GridNotes(
+                          notes: notes,
+                          getNotes: getNotes,
+                          toggleThemeIcon: widget.toggleThemeIcon,
+                        )
+                      : ListNotes(
+                          notes: notes,
+                          getNotes: getNotes,
+                          toggleThemeIcon: widget.toggleThemeIcon,
+                        )),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (MyApp.themeNotifier.value == ThemeMode.light) {
-            MyApp.themeNotifier.value = ThemeMode.dark;
-            widget.toggleThemeIcon(Icons.light_mode);
-          } else {
-            MyApp.themeNotifier.value = ThemeMode.light;
-            widget.toggleThemeIcon(Icons.dark_mode);
-          }
+          widget.toggleThemeIcon();
         },
         backgroundColor: Colors.amber,
-        child: Icon(widget.themeIcon),
+        child: const Icon(Icons.brightness_4),
       ),
     );
   }

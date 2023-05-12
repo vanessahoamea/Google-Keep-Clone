@@ -39,8 +39,8 @@ void main() async {
     }
   });
 
-  app.post("/notes/<id>", (Request request, String id) async {
-    int? userId;
+  // create new note
+  app.post("/notes", (Request request) async {
     DateTime now = DateTime.now();
     String today = DateTime(now.year, now.month, now.day)
         .toString()
@@ -49,23 +49,24 @@ void main() async {
     var payload = await request.readAsString();
     var data = json.decode(payload);
 
-    try {
-      userId = int.parse(id);
-    } catch (e) {
+    if (!data.containsKey("user_id") ||
+        !data.containsKey("title") ||
+        !data.containsKey("content")) {
       return Response.badRequest(
-          body: json.encode({"message": "Invalid user ID."}),
+          body: json.encode({
+            "message": "Fields 'user_id', 'title', 'content' are required."
+          }),
           headers: {"Access-Control-Allow-Origin": "*"});
     }
 
-    if (!data.containsKey("title") || !data.containsKey("content")) {
+    if (data["title"] == "" && data["content"] == "") {
       return Response.badRequest(
-          body: json
-              .encode({"message": "Fields 'title', 'content' are required."}),
+          body: json.encode({"message": "Notes can't be blank."}),
           headers: {"Access-Control-Allow-Origin": "*"});
     }
 
-    var resp =
-        await db.createNote(userId, data["title"], data["content"], today);
+    var resp = await db.createNote(
+        data["user_id"], data["title"], data["content"], today);
     if (resp) {
       return Response.ok(json.encode({"message": "Note created successfully."}),
           headers: {"Access-Control-Allow-Origin": "*"});
@@ -76,8 +77,9 @@ void main() async {
     }
   });
 
+  // get all notes belonging to a specific user
   app.get("/notes/<id>", (Request request, String id) async {
-    int? userId;
+    int userId;
 
     try {
       userId = int.parse(id);
@@ -100,6 +102,50 @@ void main() async {
 
     return Response.ok(json.encode({"data": allNotes}),
         headers: {"Access-Control-Allow-Origin": "*"});
+  });
+
+  // edit note
+  app.post("/notes/<id>", (Request request, String id) async {
+    int noteId;
+    try {
+      noteId = int.parse(id);
+    } catch (e) {
+      return Response.badRequest(
+          body: json.encode({"message": "Invalid note ID."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+
+    DateTime now = DateTime.now();
+    String today = DateTime(now.year, now.month, now.day)
+        .toString()
+        .replaceAll("00:00:00.000", "");
+
+    var payload = await request.readAsString();
+    var data = json.decode(payload);
+
+    if (!data.containsKey("title") || !data.containsKey("content")) {
+      return Response.badRequest(
+          body: json
+              .encode({"message": "Fields 'title', 'content' are required."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+
+    if (data["title"] == "" && data["content"] == "") {
+      return Response.badRequest(
+          body: json.encode({"message": "Notes can't be blank."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+
+    var resp =
+        await db.updateNote(noteId, data["title"], data["content"], today);
+    if (resp) {
+      return Response.ok(json.encode({"message": "Note updated successfully."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    } else {
+      return Response.internalServerError(
+          body: json.encode({"message": "Something went wrong."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
   });
 
   var server = await io.serve(app, "192.168.100.58", 8080);
