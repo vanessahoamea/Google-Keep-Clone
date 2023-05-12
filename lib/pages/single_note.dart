@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:project/components/error_popup.dart";
+import "package:project/components/warning_popup.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
 
@@ -26,12 +27,17 @@ class SingleNote extends StatefulWidget {
 class _SingleNoteState extends State<SingleNote> {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
-  bool savedNote = false;
+  bool savedNote = true;
+
+  void isChanged(String text, String? original) {
+    setState(() {
+      savedNote = (text == original);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    print("Saved note: ${savedNote}");
     titleController = TextEditingController(text: widget.noteTitle ?? "");
     contentController = TextEditingController(text: widget.noteContent ?? "");
   }
@@ -40,6 +46,14 @@ class _SingleNoteState extends State<SingleNote> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        bool isNewEmptyNote = widget.noteId == null &&
+            titleController.text == "" &&
+            contentController.text == "";
+        if (!savedNote && !isNewEmptyNote) {
+          String? option = await WarningPopup(context,
+              "Are you sure you want to discard your changes to this note?");
+          return option == "OK" ? true : false;
+        }
         return true;
       },
       child: Scaffold(
@@ -49,36 +63,56 @@ class _SingleNoteState extends State<SingleNote> {
           actions: [
             IconButton(
               onPressed: () async {
-                final endpoint =
-                    widget.noteId == null ? "notes" : "notes/${widget.noteId}";
-                final response = await http.post(
-                  Uri.parse("http://192.168.100.58:8080/$endpoint"),
-                  body: json.encode({
-                    "user_id": widget.userId,
-                    "title": titleController.text,
-                    "content": contentController.text,
-                  }),
-                );
+                try {
+                  final endpoint = widget.noteId == null
+                      ? "notes"
+                      : "notes/${widget.noteId}";
+                  final response = await http.post(
+                    Uri.parse("http://192.168.100.58:8080/$endpoint"),
+                    body: json.encode({
+                      "user_id": widget.userId,
+                      "title": titleController.text,
+                      "content": contentController.text,
+                    }),
+                  );
 
-                if (response.statusCode == 200) {
+                  if (response.statusCode == 200) {
+                    // ignore: use_build_context_synchronously
+                    Navigator.pop(context, true);
+                  } else {
+                    throw Exception(json.decode(response.body)["message"]);
+                  }
+                } catch (e) {
                   // ignore: use_build_context_synchronously
-                  Navigator.pop(context, true);
-                } else {
-                  // ignore: use_build_context_synchronously
-                  ErrorPopup(context, "Error",
-                      "Failed to save note: ${json.decode(response.body)['message']}");
+                  ErrorPopup(context, "Error", "Failed to save note: $e");
                 }
-
-                setState(() {
-                  savedNote = true;
-                });
               },
               icon: const Icon(Icons.save_outlined, color: Colors.black),
               tooltip: "Save",
             ),
             if (widget.noteId != null)
               IconButton(
-                onPressed: () {},
+                onPressed: () async {
+                  String? option = await WarningPopup(context,
+                      "Are you sure you want to delete this note? This action can't be undone.");
+
+                  if (option == "OK") {
+                    try {
+                      final response = await http.post(Uri.parse(
+                          "http://192.168.100.58:8080/delete-note/${widget.noteId}"));
+
+                      if (response.statusCode == 200) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.pop(context, true);
+                      } else {
+                        throw Exception(json.decode(response.body)["message"]);
+                      }
+                    } catch (e) {
+                      // ignore: use_build_context_synchronously
+                      ErrorPopup(context, "Error", "Failed to delete note: $e");
+                    }
+                  }
+                },
                 icon: const Icon(Icons.delete, color: Colors.black),
                 tooltip: "Delete",
               ),
@@ -86,9 +120,10 @@ class _SingleNoteState extends State<SingleNote> {
         ),
         body: ListView(
           padding: const EdgeInsets.all(15),
-          children: [
+          children: <Widget>[
             TextFormField(
               controller: titleController,
+              onChanged: (text) => isChanged(text, widget.noteTitle),
               decoration: const InputDecoration(
                 hintText: "Title",
                 border: InputBorder.none,
@@ -97,6 +132,7 @@ class _SingleNoteState extends State<SingleNote> {
             ),
             TextFormField(
               controller: contentController,
+              onChanged: (text) => isChanged(text, widget.noteContent),
               decoration: const InputDecoration(
                 hintText: "Take a note...",
                 border: InputBorder.none,
@@ -108,9 +144,7 @@ class _SingleNoteState extends State<SingleNote> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            widget.toggleThemeIcon();
-          },
+          onPressed: () => widget.toggleThemeIcon(),
           backgroundColor: Colors.amber,
           child: const Icon(Icons.brightness_4),
         ),

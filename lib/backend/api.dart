@@ -1,4 +1,3 @@
-import "package:postgres/postgres.dart";
 import "package:project/backend/database.dart";
 import "package:shelf_router/shelf_router.dart";
 import "package:shelf/shelf.dart";
@@ -140,6 +139,28 @@ void main() async {
         await db.updateNote(noteId, data["title"], data["content"], today);
     if (resp) {
       return Response.ok(json.encode({"message": "Note updated successfully."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    } else {
+      return Response.internalServerError(
+          body: json.encode({"message": "Something went wrong."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+  });
+
+  // delete note
+  app.post("/delete-note/<id>", (Request request, String id) async {
+    int noteId;
+    try {
+      noteId = int.parse(id);
+    } catch (e) {
+      return Response.badRequest(
+          body: json.encode({"message": "Invalid note ID."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+
+    var resp = await db.deleteNote(noteId);
+    if (resp) {
+      return Response.ok(json.encode({"message": "Note deleted successfully."}),
           headers: {"Access-Control-Allow-Origin": "*"});
     } else {
       return Response.internalServerError(

@@ -111,9 +111,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          widget.toggleThemeIcon();
-        },
+        onPressed: () => widget.toggleThemeIcon(),
         backgroundColor: Colors.amber,
         child: const Icon(Icons.brightness_4),
       ),

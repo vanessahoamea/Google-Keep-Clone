@@ -81,9 +81,7 @@ class _AppButtonsState extends State<AppButtons> {
           Tooltip(
             message: "Refresh",
             child: ElevatedButton(
-              onPressed: () {
-                widget.getNotes();
-              },
+              onPressed: () => widget.getNotes(),
               style: ElevatedButton.styleFrom(
                 shape: const CircleBorder(),
                 padding: const EdgeInsets.all(15),

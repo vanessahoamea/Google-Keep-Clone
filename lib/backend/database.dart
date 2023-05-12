@@ -105,4 +105,27 @@ class Database {
     await conn.close();
     return result;
   }
+
+  Future<bool> deleteNote(int noteId) async {
+    PostgreSQLConnection conn = PostgreSQLConnection(
+      "localhost",
+      5432,
+      "google-keep",
+      username: "postgres",
+      password: "postgres",
+    );
+
+    await conn.open();
+
+    bool result = true;
+    try {
+      await conn.query("DELETE FROM notes WHERE id = @id",
+          substitutionValues: {"id": noteId});
+    } catch (e) {
+      result = false;
+    }
+
+    await conn.close();
+    return result;
+  }
 }

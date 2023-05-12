@@ -80,9 +80,7 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          toggleThemeIcon();
-        },
+        onPressed: () => toggleThemeIcon(),
         backgroundColor: Colors.amber,
         child: const Icon(Icons.brightness_4),
       ),

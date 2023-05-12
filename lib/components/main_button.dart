@@ -13,9 +13,7 @@ class MainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        redirect(context);
-      },
+      onPressed: () => redirect(context),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.amber,
         padding: const EdgeInsets.all(15),
