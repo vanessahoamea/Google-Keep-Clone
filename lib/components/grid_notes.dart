@@ -35,6 +35,7 @@ class GridNotes extends StatelessWidget {
                     noteId: notes[index]["id"],
                     noteTitle: notes[index]["title"],
                     noteContent: notes[index]["content"],
+                    noteDate: notes[index]["date_modified"],
                     toggleTheme: toggleTheme,
                   ),
                 ),

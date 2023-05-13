@@ -25,7 +25,8 @@ void main() async {
           headers: {"Access-Control-Allow-Origin": "*"});
     }
 
-    var resp = await db.createUser(data["email"], data["password"]);
+    var resp = await db.createUser(
+        data["email"].trim().toLowerCase(), data["password"]);
     if (resp == 1) {
       return Response.ok(
           json.encode({"message": "Account created successfully."}),
@@ -52,12 +53,13 @@ void main() async {
           headers: {"Access-Control-Allow-Origin": "*"});
     }
 
-    var resp = await db.loginUser(data["email"], data["password"]);
+    var resp = await db.loginUser(
+        data["email"].trim().toLowerCase(), data["password"]);
     if (resp != null) {
       return Response.ok(
           json.encode({
             "id": resp,
-            "email": data["email"],
+            "email": data["email"].trim().toLowerCase(),
           }),
           headers: {"Access-Control-Allow-Origin": "*"});
     } else {
@@ -132,7 +134,7 @@ void main() async {
   });
 
   // edit note
-  app.post("/notes/<id>", (Request request, String id) async {
+  app.post("/edit-note/<id>", (Request request, String id) async {
     int noteId;
     try {
       noteId = int.parse(id);

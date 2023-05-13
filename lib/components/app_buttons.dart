@@ -42,6 +42,7 @@ class _AppButtonsState extends State<AppButtons> {
                         noteId: null,
                         noteTitle: null,
                         noteContent: null,
+                        noteDate: null,
                         toggleTheme: widget.toggleTheme,
                       ),
                     ));

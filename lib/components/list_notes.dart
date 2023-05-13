@@ -31,6 +31,7 @@ class ListNotes extends StatelessWidget {
                     noteId: item["id"],
                     noteTitle: item["title"],
                     noteContent: item["content"],
+                    noteDate: item["date_modified"],
                     toggleTheme: toggleTheme,
                   ),
                 ),

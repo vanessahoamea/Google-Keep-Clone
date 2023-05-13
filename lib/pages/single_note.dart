@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:project/components/error_popup.dart";
+import "package:project/components/note_content.dart";
 import "package:project/components/warning_popup.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
@@ -11,6 +12,7 @@ class SingleNote extends StatefulWidget {
     required this.noteId,
     required this.noteTitle,
     required this.noteContent,
+    required this.noteDate,
     required this.toggleTheme,
   });
 
@@ -18,6 +20,7 @@ class SingleNote extends StatefulWidget {
   final int? noteId;
   final String? noteTitle;
   final String? noteContent;
+  final String? noteDate;
   final void Function() toggleTheme;
 
   @override
@@ -33,6 +36,24 @@ class _SingleNoteState extends State<SingleNote> {
     setState(() {
       savedNote = (text == original);
     });
+  }
+
+  void handleRequest(
+      BuildContext context, Uri uri, String? body, String action) async {
+    try {
+      final response = await http.post(uri, body: body);
+
+      if (response.statusCode == 200) {
+        Navigator.pop(context, true);
+      } else {
+        throw Exception(json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      String message = e.toString().contains("Exception: ")
+          ? e.toString().split("Exception: ")[1]
+          : e.toString();
+      ErrorPopup(context, "Error", "Failed to $action note: $message");
+    }
   }
 
   @override
@@ -63,32 +84,17 @@ class _SingleNoteState extends State<SingleNote> {
           actions: [
             IconButton(
               onPressed: () async {
-                try {
-                  final endpoint = widget.noteId == null
-                      ? "notes"
-                      : "notes/${widget.noteId}";
-                  final response = await http.post(
-                    Uri.parse("http://192.168.100.58:8080/$endpoint"),
-                    body: json.encode({
-                      "user_id": widget.userId,
-                      "title": titleController.text,
-                      "content": contentController.text,
-                    }),
-                  );
+                final endpoint = widget.noteId == null
+                    ? "notes"
+                    : "edit-note/${widget.noteId}";
+                final uri = Uri.parse("http://192.168.100.58:8080/$endpoint");
+                final body = json.encode({
+                  "user_id": widget.userId,
+                  "title": titleController.text,
+                  "content": contentController.text,
+                });
 
-                  if (response.statusCode == 200) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context, true);
-                  } else {
-                    throw Exception(json.decode(response.body)["message"]);
-                  }
-                } catch (e) {
-                  String message = e.toString().contains("Exception: ")
-                      ? e.toString().split("Exception: ")[1]
-                      : e.toString();
-                  // ignore: use_build_context_synchronously
-                  ErrorPopup(context, "Error", "Failed to save note: $message");
-                }
+                handleRequest(context, uri, body, "save");
               },
               icon: const Icon(Icons.save_outlined, color: Colors.black),
               tooltip: "Save",
@@ -100,20 +106,10 @@ class _SingleNoteState extends State<SingleNote> {
                       "Are you sure you want to delete this note? This action can't be undone.");
 
                   if (option == "OK") {
-                    try {
-                      final response = await http.post(Uri.parse(
-                          "http://192.168.100.58:8080/delete-note/${widget.noteId}"));
+                    final uri = Uri.parse(
+                        "http://192.168.100.58:8080/delete-note/${widget.noteId}");
 
-                      if (response.statusCode == 200) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(context, true);
-                      } else {
-                        throw Exception(json.decode(response.body)["message"]);
-                      }
-                    } catch (e) {
-                      // ignore: use_build_context_synchronously
-                      ErrorPopup(context, "Error", "Failed to delete note: $e");
-                    }
+                    handleRequest(context, uri, null, "delete");
                   }
                 },
                 icon: const Icon(Icons.delete, color: Colors.black),
@@ -121,30 +117,13 @@ class _SingleNoteState extends State<SingleNote> {
               ),
           ],
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(15),
-          children: <Widget>[
-            TextFormField(
-              controller: titleController,
-              onChanged: (text) => isChanged(text, widget.noteTitle),
-              decoration: const InputDecoration(
-                hintText: "Title",
-                border: InputBorder.none,
-              ),
-              style: const TextStyle(fontSize: 30),
-            ),
-            TextFormField(
-              controller: contentController,
-              onChanged: (text) => isChanged(text, widget.noteContent),
-              decoration: const InputDecoration(
-                hintText: "Take a note...",
-                border: InputBorder.none,
-              ),
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ],
+        body: NoteContent(
+          titleController: titleController,
+          contentController: contentController,
+          noteTitle: widget.noteTitle,
+          noteContent: widget.noteContent,
+          noteDate: widget.noteDate,
+          isChanged: isChanged,
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => widget.toggleTheme(),
