@@ -1,6 +1,34 @@
 import "package:postgres/postgres.dart";
 
 class Database {
+  Future<int> createUser(String email, String password) async {
+    PostgreSQLConnection conn = PostgreSQLConnection(
+      "localhost",
+      5432,
+      "google-keep",
+      username: "postgres",
+      password: "postgres",
+    );
+
+    await conn.open();
+
+    var user = await conn.query("SELECT * FROM users WHERE email = @email",
+        substitutionValues: {"email": email});
+    if (user.isNotEmpty) return -1;
+
+    int result = 1;
+    try {
+      await conn.query(
+          "INSERT INTO users (email, password) VALUES (@email, @password)",
+          substitutionValues: {"email": email, "password": password});
+    } catch (e) {
+      result = 0;
+    }
+
+    await conn.close();
+    return result;
+  }
+
   Future<int?> loginUser(String email, String password) async {
     PostgreSQLConnection conn = PostgreSQLConnection(
       "localhost",

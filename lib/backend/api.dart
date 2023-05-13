@@ -13,6 +13,34 @@ void main() async {
         headers: {"Access-Control-Allow-Origin": "*"});
   });
 
+  // authentication
+  app.post("/register", (Request request) async {
+    var payload = await request.readAsString();
+    var data = json.decode(payload);
+
+    if (!data.containsKey("email") || !data.containsKey("password")) {
+      return Response.badRequest(
+          body: json
+              .encode({"message": "Fields 'email', 'password' are required."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+
+    var resp = await db.createUser(data["email"], data["password"]);
+    if (resp == 1) {
+      return Response.ok(
+          json.encode({"message": "Account created successfully."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    } else if (resp == -1) {
+      return Response.forbidden(
+          json.encode({"message": "E-mail is already taken."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    } else {
+      return Response.internalServerError(
+          body: json.encode({"message": "Something went wrong."}),
+          headers: {"Access-Control-Allow-Origin": "*"});
+    }
+  });
+
   app.post("/login", (Request request) async {
     var payload = await request.readAsString();
     var data = json.decode(payload);

@@ -11,14 +11,14 @@ class SingleNote extends StatefulWidget {
     required this.noteId,
     required this.noteTitle,
     required this.noteContent,
-    required this.toggleThemeIcon,
+    required this.toggleTheme,
   });
 
   final int? userId;
   final int? noteId;
   final String? noteTitle;
   final String? noteContent;
-  final void Function() toggleThemeIcon;
+  final void Function() toggleTheme;
 
   @override
   State<SingleNote> createState() => _SingleNoteState();
@@ -83,8 +83,11 @@ class _SingleNoteState extends State<SingleNote> {
                     throw Exception(json.decode(response.body)["message"]);
                   }
                 } catch (e) {
+                  String message = e.toString().contains("Exception: ")
+                      ? e.toString().split("Exception: ")[1]
+                      : e.toString();
                   // ignore: use_build_context_synchronously
-                  ErrorPopup(context, "Error", "Failed to save note: $e");
+                  ErrorPopup(context, "Error", "Failed to save note: $message");
                 }
               },
               icon: const Icon(Icons.save_outlined, color: Colors.black),
@@ -144,7 +147,7 @@ class _SingleNoteState extends State<SingleNote> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => widget.toggleThemeIcon(),
+          onPressed: () => widget.toggleTheme(),
           backgroundColor: Colors.amber,
           child: const Icon(Icons.brightness_4),
         ),

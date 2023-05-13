@@ -12,13 +12,13 @@ class HomePage extends StatefulWidget {
     required this.title,
     required this.userId,
     required this.userEmail,
-    required this.toggleThemeIcon,
+    required this.toggleTheme,
   });
 
   final String title;
   final int userId;
   final String userEmail;
-  final void Function() toggleThemeIcon;
+  final void Function() toggleTheme;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
               toggleNotesView: toggleNotesView,
               getNotes: getNotes,
               userId: widget.userId,
-              toggleThemeIcon: widget.toggleThemeIcon,
+              toggleTheme: widget.toggleTheme,
             ),
 
             // view all notes
@@ -99,19 +99,19 @@ class _HomePageState extends State<HomePage> {
                       ? GridNotes(
                           notes: notes,
                           getNotes: getNotes,
-                          toggleThemeIcon: widget.toggleThemeIcon,
+                          toggleTheme: widget.toggleTheme,
                         )
                       : ListNotes(
                           notes: notes,
                           getNotes: getNotes,
-                          toggleThemeIcon: widget.toggleThemeIcon,
+                          toggleTheme: widget.toggleTheme,
                         )),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => widget.toggleThemeIcon(),
+        onPressed: () => widget.toggleTheme(),
         backgroundColor: Colors.amber,
         child: const Icon(Icons.brightness_4),
       ),

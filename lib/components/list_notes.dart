@@ -6,12 +6,12 @@ class ListNotes extends StatelessWidget {
     super.key,
     required this.notes,
     required this.getNotes,
-    required this.toggleThemeIcon,
+    required this.toggleTheme,
   });
 
   final List notes;
   final void Function() getNotes;
-  final void Function() toggleThemeIcon;
+  final void Function() toggleTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class ListNotes extends StatelessWidget {
                     noteId: item["id"],
                     noteTitle: item["title"],
                     noteContent: item["content"],
-                    toggleThemeIcon: toggleThemeIcon,
+                    toggleTheme: toggleTheme,
                   ),
                 ),
               );
@@ -46,7 +46,7 @@ class ListNotes extends StatelessWidget {
                 padding: const EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     if (item["title"] != "" && item["title"] != null)
                       Text(item["title"],
                           style: const TextStyle(

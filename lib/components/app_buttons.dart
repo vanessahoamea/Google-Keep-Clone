@@ -8,14 +8,14 @@ class AppButtons extends StatefulWidget {
     required this.toggleNotesView,
     required this.getNotes,
     required this.userId,
-    required this.toggleThemeIcon,
+    required this.toggleTheme,
   });
 
   final IconData notesView;
   final void Function(IconData) toggleNotesView;
   final void Function() getNotes;
   final int? userId;
-  final void Function() toggleThemeIcon;
+  final void Function() toggleTheme;
 
   @override
   State<AppButtons> createState() => _AppButtonsState();
@@ -28,7 +28,7 @@ class _AppButtonsState extends State<AppButtons> {
       padding: const EdgeInsets.only(top: 50, bottom: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: <Widget>[
           // add new note button
           Tooltip(
             message: "Create note",
@@ -42,7 +42,7 @@ class _AppButtonsState extends State<AppButtons> {
                         noteId: null,
                         noteTitle: null,
                         noteContent: null,
-                        toggleThemeIcon: widget.toggleThemeIcon,
+                        toggleTheme: widget.toggleTheme,
                       ),
                     ));
                 if (reload != null && reload) widget.getNotes();
