@@ -3,11 +3,10 @@ import "package:project/components/error_popup.dart";
 import "package:project/components/input_field.dart";
 import "package:project/components/main_button.dart";
 import "package:project/pages/home.dart";
+import "package:project/pages/register.dart";
 import "package:project/main.dart";
 import "package:http/http.dart" as http;
 import "dart:convert";
-
-import "package:project/pages/register.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -104,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
                 child: const Text(
-                  "Sign up",
+                  "Register",
                   style: TextStyle(
                       color: Colors.amber, fontWeight: FontWeight.bold),
                 ),
